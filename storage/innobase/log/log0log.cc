@@ -999,8 +999,7 @@ static void log_write(bool rotate_key)
 	if (UNIV_UNLIKELY(srv_shutdown_state != SRV_SHUTDOWN_NONE)) {
 		service_manager_extend_timeout(INNODB_EXTEND_TIMEOUT_INTERVAL,
 					       "InnoDB log write: "
-					       LSN_PF "," LSN_PF,
-					       log_sys.write_lsn, lsn);
+					       LSN_PF, log_sys.write_lsn);
 	}
 
 	if (log_sys.is_encrypted()) {
