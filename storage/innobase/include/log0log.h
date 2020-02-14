@@ -764,7 +764,9 @@ public:
 
 /** Redo log system */
 extern log_t	log_sys;
+#ifdef UNIV_DEBUG
 extern bool log_write_lock_own();
+#endif
 
 /** Calculate the offset of a log sequence number.
 @param[in]     lsn     log sequence number

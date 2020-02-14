@@ -1027,7 +1027,7 @@ static void log_write(bool rotate_key)
 static group_commit_lock write_lock;
 static group_commit_lock flush_lock;
 
-#ifndef DBUG_OFF
+#ifdef UNIV_DEBUG
 bool log_write_lock_own()
 {
   return write_lock.is_owner();

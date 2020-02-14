@@ -19,7 +19,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 The  group commit synchronization used in log_write_up_to()
 works as follows
 
-For simplicity, lets consider only write operation,synchronozation of
+For simplicity, lets consider only write operation,synchronization of
 flush operation works the same.
 
 Rules of the game
@@ -140,7 +140,7 @@ void binary_semaphore::wake()
   }
 }
 #else
-void binary_semaphore::wake()
+void binary_semaphore::wait()
 {
   std::unique_lock<std::mutex> lk(m_mtx);
   while (!m_signalled)
@@ -151,6 +151,7 @@ void binary_semaphore::wake()
 {
   std::unique_lock<std::mutex> lk(m_mtx);
   m_signalled = true;
+  lk.unlock();
   m_cv.notify_one();
 }
 #endif
@@ -227,7 +228,7 @@ group_commit_lock::lock_return_code group_commit_lock::acquire(value_type num)
     {
       /* Take the lock, become group commit leader.*/
       m_lock = true;
-#ifndef DBUG_OFF
+#ifdef UNIV_DEBUG
       m_owner_id = std::this_thread::get_id();
 #endif
       return lock_return_code::ACQUIRED;
@@ -297,9 +298,10 @@ void group_commit_lock::release(value_type num)
   }
 }
 
-#ifndef DBUG_OFF
+#ifdef UNIV_DEBUG
 bool group_commit_lock::is_owner()
 {
+  std::lock_guard<std::mutex> lk(m_mtx);
   return m_lock && std::this_thread::get_id() == m_owner_id;
 }
 #endif

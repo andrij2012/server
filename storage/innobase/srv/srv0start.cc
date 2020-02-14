@@ -1114,11 +1114,13 @@ srv_prepare_to_delete_redo_log_files(
 		}
 
 		srv_start_lsn = flushed_lsn;
+		bool do_flush_logs = flushed_lsn != log_sys.flushed_to_disk_lsn;
 		/* Flush the old log files. */
 		log_mutex_exit();
 
-		log_write_up_to(flushed_lsn, true);
-
+		if (do_flush_logs) {
+			log_write_up_to(flushed_lsn, false);
+		}
 		log_sys.log.flush_data_only();
 
 		ut_ad(flushed_lsn == log_get_lsn());

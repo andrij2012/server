@@ -17,6 +17,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <atomic>
 #include <thread>
+#include <univ.i> /* UNIV_DEBUG */
 #include <log0types.h>
 
 struct group_commit_waiter_t;
@@ -55,7 +56,7 @@ Operations supported on this semaphore
 class group_commit_lock
 {
   using value_type = lsn_t;
-#ifndef DBUG_OFF
+#ifdef UNIV_DEBUG
   std::thread::id m_owner_id{};
 #endif
   std::mutex m_mtx;
@@ -75,7 +76,7 @@ public:
   value_type value() const;
   value_type pending() const;
   void set_pending(value_type num);
-#ifndef DBUG_OFF
+#ifdef UNIV_DEBUG
   bool is_owner();
 #endif
 };
