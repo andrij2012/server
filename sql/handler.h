@@ -833,7 +833,7 @@ struct xid_t {
   long formatID;
   long gtrid_length;
   long bqual_length;
-  char data[XIDDATASIZE];  // not \0-terminated !
+  char data[XIDDATASIZE]={0};  // not \0-terminated !
 
   xid_t() {}                                /* Remove gcc warning */
   bool eq(struct xid_t *xid) const

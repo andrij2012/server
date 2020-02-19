@@ -2176,16 +2176,18 @@ static my_bool xarecover_handlerton(THD *unused, plugin_ref plugin,
             _db_doprnt_("ignore xid %s", xid_to_str(buf, info->list+i));
             });
           XID *foreign_xid= info->list + i;
-          xid_cache_insert(info->list + i, opt_bin_log);
+          xid_cache_insert(foreign_xid, opt_bin_log);
           info->found_foreign_xids++;
-          fprintf(stderr,"-------In xa recover handler foreign xid from engine:%s\n", foreign_xid->data);
 
-          // For each foreign xid prepraed engine check if it is present in
-          // prepare_list sent by binlog.
+           /*
+             For each foreign xid prepraed in engine, check if it is present in
+             prepare_list sent by binlog.
+           */
             if (info->prepare_list )
             {
               struct xa_recovery_member *member= NULL;
-              if ((member= (xa_recovery_member *) my_hash_search(info->prepare_list, (uchar *)foreign_xid, sizeof(XID))))
+              if ((member= (xa_recovery_member *) my_hash_search(info->prepare_list,
+                      (uchar *)foreign_xid, sizeof(XID))))
               {
                 member->in_engine_prepare= true;
               }

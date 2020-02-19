@@ -5164,8 +5164,7 @@ static int init_server_components()
   //TODO - Need review from RUNTIME TEAM - Begin
   init_update_queries();
 
-  if (mysql_rm_tmp_tables() || acl_init(opt_noacl) ||
-      my_tz_init((THD *)0, default_tz_name, opt_bootstrap))
+  if (acl_init(opt_noacl))
     unireg_abort(1);
 
   if (!opt_noacl)
@@ -5241,7 +5240,6 @@ static int init_server_components()
   ft_init_stopwords();
 
   init_max_user_conn();
-//  init_update_queries();
   init_global_user_stats();
   init_global_client_stats();
   if (!opt_bootstrap)
@@ -5576,6 +5574,9 @@ int mysqld_main(int argc, char **argv)
   */
   start_signal_handler();				// Creates pidfile
 
+  if (mysql_rm_tmp_tables() ||
+      my_tz_init((THD *)0, default_tz_name, opt_bootstrap))
+    unireg_abort(1);
   udf_init();
 
   if (opt_bootstrap) /* If running with bootstrap, do not start replication. */

@@ -1,3 +1,27 @@
+# ==== Purpose ====
+#
+# Test verifies that XA PREPARE transactions are crash safe.
+#
+# ==== Implementation ====
+#
+# Steps:
+#    0 - Generate 3 explicit XA transactions. 'xa1', 'xa2' and 'xa3'.
+#        Using debug simulation hold the execution of second XA PREPARE
+#        statement after the XA PREPARE is written to the binary log.
+#        With this the prepare will not be done in engine.
+#    1 - For 'xa3' allow the PREPARE statement to be written to binary log and
+#        simulate server crash.
+#    2 - Restart the server. The recovery code should successfully recover
+#        'xa2' and 'xa3'.
+#    3 - When server is up, execute XA RECOVER and verify that 'xa2' and 'xa3'
+#        are present along with 'xa1'.
+#    4 - Commit all the XA transactions and verify their correctness.
+#
+# ==== References ====
+#
+# MDEV-21469: Implement crash-safe logging of the user XA
+
+
 --source include/have_innodb.inc
 --source include/master-slave.inc
 --source include/have_debug.inc
