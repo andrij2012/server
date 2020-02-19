@@ -726,8 +726,7 @@ bool trans_xa_rollback(THD *thd)
 
   DBUG_ENTER("trans_xa_rollback");
 
-  if (!xid_state.is_explicit_XA() ||
-      !xid_state.xid_cache_element->xid.eq(thd->lex->xid))
+  if (!xid_state.is_explicit_XA())
   {
     if (thd->fix_xid_hash_pins())
     {
@@ -766,6 +765,11 @@ bool trans_xa_rollback(THD *thd)
     else
       my_error(ER_XAER_NOTA, MYF(0));
     DBUG_RETURN(thd->get_stmt_da()->is_error());
+  }
+  else if (xid_state.xid_cache_element->xid.eq(thd->lex->xid))
+  {
+    xid_state.er_xaer_rmfail();
+    DBUG_RETURN(true);
   }
 
   if (xid_state.xid_cache_element->xa_state == XA_ACTIVE)
